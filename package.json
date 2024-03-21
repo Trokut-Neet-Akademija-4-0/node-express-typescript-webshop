@@ -1,0 +1,11 @@
+{
+  "name": "nodeexpressbasictemplate",
+  "version": "1.0.0",
+  "description": "Node.js + ExpressJS template",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
