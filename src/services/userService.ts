@@ -20,6 +20,13 @@ class UserService {
   getUserById(id: string): User | undefined {
     return this.users.find((user) => user.id === id)
   }
+
+  deleteUserById(id: string): User | undefined {
+    return this.users.splice(
+      this.users.findIndex((user) => user.id === id),
+      1,
+    )[0]
+  }
 }
 
 export default new UserService()
