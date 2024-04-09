@@ -27,5 +27,6 @@
         // Add any TypeScript-specific rules here
       }
     }
-  ]
+  ],
+  "ignorePatterns": ["dist/"]
 }
