@@ -10,7 +10,6 @@ class Cart implements ICart {
     this.products = []
     this.total = 0
     this.discountedTotal = 0
-    this.totalProducts = 0
     this.totalQuantity = 0
     this.userId = 0
   }
@@ -25,7 +24,9 @@ class Cart implements ICart {
 
   userId: number
 
-  totalProducts: number
+  public get totalProducts() {
+    return this.products.length
+  }
 
   totalQuantity: number
 }

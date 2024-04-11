@@ -106,7 +106,6 @@ class CartService {
 
     this.cart.total = total
     this.cart.discountedTotal = totalDiscounted
-    this.cart.totalProducts = this.cart.products.length
     this.cart.totalQuantity = totalQuantity
   }
 }
