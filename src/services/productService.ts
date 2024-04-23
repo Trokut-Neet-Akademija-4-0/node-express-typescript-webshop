@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+import Proizvod from '../entities/Proizvod'
 import IProduct from '../models/interfaces/productInterface'
 import products from '../models/productsModel'
 import HttpError from '../utils/HttpError'
@@ -5,8 +7,8 @@ import HttpError from '../utils/HttpError'
 class ProductService {
   private products: IProduct[] = products
 
-  getAllProducts(): IProduct[] {
-    return this.products
+  async getAllProducts(): Promise<Proizvod[]> {
+    return Proizvod.find()
   }
 
   getProductById(id: number): IProduct {
@@ -28,9 +30,14 @@ class ProductService {
     return deletedProduct[0]
   }
 
-  addNewProduct(product: IProduct): IProduct {
-    this.products.push(product)
-    return product
+  async addNewProduct(product: Proizvod): Promise<Proizvod> {
+    const proizvod = new Proizvod()
+    proizvod.imeProizvoda = product.imeProizvoda
+    proizvod.opis = product.opis
+    proizvod.proizvodjac = product.proizvodjac
+    proizvod.cijena = product.cijena
+    proizvod.kolicina = product.kolicina
+    return proizvod.save()
   }
 }
 
