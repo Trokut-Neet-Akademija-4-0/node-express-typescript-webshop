@@ -23,11 +23,10 @@ export default class ProizvodKupac extends BaseEntity {
 
   @Column('numeric', {
     name: 'cijena',
-    nullable: true,
     precision: 10,
     scale: 2,
   })
-  cijena!: string | null
+  cijena!: number
 
   @ManyToOne(() => Kosarica, (kosarica: Kosarica) => kosarica.proizvodKupacs)
   @JoinColumn([{ name: 'kosarica_id', referencedColumnName: 'kosaricaId' }])

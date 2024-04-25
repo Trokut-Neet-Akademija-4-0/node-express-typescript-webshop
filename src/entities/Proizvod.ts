@@ -34,7 +34,7 @@ export default class Proizvod extends BaseEntity {
   opis!: string | null
 
   @Column('numeric', { name: 'cijena', precision: 10, scale: 2 })
-  cijena!: string
+  cijena!: number
 
   @Column('integer', { name: 'kolicina', nullable: true })
   kolicina!: number | null
@@ -47,4 +47,17 @@ export default class Proizvod extends BaseEntity {
 
   @OneToMany(() => Slika, (slika: Slika) => slika.proizvod)
   slikas!: Slika[]
+
+  updateQuantityAndPrice(quantity: number, price: number) {
+    this.cijena = price
+    this.kolicina = quantity
+  }
+
+  updateExistingProduct(updatedData: Proizvod) {
+    this.cijena = updatedData.cijena
+    this.kolicina = updatedData.kolicina
+    this.imeProizvoda = updatedData.imeProizvoda
+    this.opis = updatedData.opis
+    this.proizvodjac = updatedData.proizvodjac
+  }
 }

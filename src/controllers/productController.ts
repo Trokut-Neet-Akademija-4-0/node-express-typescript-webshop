@@ -1,13 +1,22 @@
 import { Request, Response } from 'express'
 import productService from '../services/productService'
 import Proizvod from '../entities/Proizvod'
+import Slika from '../entities/Slika'
 
 const getAllProducts = async (req: Request, res: Response) => {
   res.send(await productService.getAllProducts())
 }
 
-const getProductById = (req: Request, res: Response) => {
-  res.send(productService.getProductById(Number.parseInt(req.params.id, 10)))
+const getProductById = async (req: Request, res: Response) => {
+  res.send(
+    await productService.getProductById(Number.parseInt(req.params.id, 10)),
+  )
+}
+
+const updateProductById = async (req: Request, res: Response) => {
+  const productId = Number.parseInt(req.params.id, 10)
+  const existingProduct = req.body as Proizvod
+  res.send(await productService.updateProduct(productId, existingProduct))
 }
 
 const createProduct = async (req: Request, res: Response) => {
@@ -15,4 +24,28 @@ const createProduct = async (req: Request, res: Response) => {
   res.send(await productService.addNewProduct(newProduct))
 }
 
-export { getAllProducts, getProductById, createProduct }
+const deleteProductById = async (req: Request, res: Response) => {
+  res.send(
+    await productService.deleteProductById(Number.parseInt(req.params.id, 10)),
+  )
+}
+
+const addProductPictures = async (req: Request, res: Response) => {
+  const productId = Number.parseInt(req.params.id, 10)
+  const newPictures = req.body as Slika[]
+  res.send(
+    await productService.addNewPicturesToExistingProduct(
+      productId,
+      newPictures,
+    ),
+  )
+}
+
+export {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  addProductPictures,
+  updateProductById,
+  deleteProductById,
+}
