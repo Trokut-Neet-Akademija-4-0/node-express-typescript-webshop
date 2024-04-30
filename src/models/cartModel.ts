@@ -1,34 +1,16 @@
-import ICart from './interfaces/cartInterface'
-import ICartProduct from './interfaces/cartProductInterface'
+import Kosarica from '../entities/Kosarica'
 
 // Cart klasa nam treba da bi pratili stanje kosarice
 // a posto se ona dinamicki generira jer nemamo gotov JSON
 // onda je bolje da je kreiramo sa klasom i rijeci new pri exportu
-class Cart implements ICart {
-  constructor() {
-    this.id = 0
-    this.products = []
-    this.total = 0
-    this.discountedTotal = 0
-    this.totalQuantity = 0
-    this.userId = 0
+class Cart extends Kosarica {
+  public get products() {
+    return this.proizvodKupacs.map((pk) => {
+      const product = pk.proizvod
+      product.updateQuantityAndPrice(pk.kolicina, pk.cijena)
+      return product
+    })
   }
-
-  products: ICartProduct[]
-
-  id: number
-
-  total: number
-
-  discountedTotal: number
-
-  userId: number
-
-  public get totalProducts() {
-    return this.products.length
-  }
-
-  totalQuantity: number
 }
 
-export default new Cart()
+export default Cart

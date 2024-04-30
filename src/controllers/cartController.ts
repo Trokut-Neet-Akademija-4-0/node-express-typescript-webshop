@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import cartService from '../services/cartService'
 
-const getCart = (req: Request, res: Response) => {
-  res.send(cartService.getCart())
+const getCart = async (req: Request, res: Response) => {
+  res.send(await cartService.getCart())
 }
 
 const addProductToCart = (req: Request, res: Response) => {

@@ -35,4 +35,7 @@ export default class Slika extends BaseEntity {
   @ManyToOne(() => Proizvod, (proizvod: Proizvod) => proizvod.slikas)
   @JoinColumn([{ name: 'proizvod_id', referencedColumnName: 'proizvodId' }])
   proizvod!: Proizvod
+
+  @Column({ type: 'integer', name: 'proizvod_id' })
+  proizvodId!: number
 }

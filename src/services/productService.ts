@@ -50,6 +50,11 @@ class ProductService {
     return proizvod.save()
   }
 
+  async getProductPictures(productId: number): Promise<Slika[]> {
+    const product = await this.getProductById(productId)
+    return product.slikas
+  }
+
   async addNewPicturesToExistingProduct(
     productId: number,
     newPictures: Slika[],
@@ -61,6 +66,28 @@ class ProductService {
       await newPictureEntity.save()
     }
     return this.getProductById(productId)
+  }
+
+  async updateExistingPicturesInExistingProduct(
+    updatePictures: Slika[],
+  ): Promise<Slika[]> {
+    const updatedPictures = new Array<Slika>()
+    for await (const picture of updatePictures) {
+      const existingPicture = await Slika.findOne({
+        where: {
+          slikaId: picture.slikaId,
+        },
+      })
+      if (existingPicture) {
+        existingPicture.isThumbnail = picture.isThumbnail
+        existingPicture.link = picture.link
+        existingPicture.naziv = picture.naziv
+        existingPicture.opis = picture.opis
+        existingPicture.proizvodId = picture.proizvodId
+        updatedPictures.push(await existingPicture.save())
+      }
+    }
+    return updatedPictures
   }
 }
 

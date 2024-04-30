@@ -6,11 +6,13 @@ import homeRoutes from './routes/homeRoutes'
 import productRoutes from './routes/productRoutes'
 import cartRoutes from './routes/cartRoutes'
 import errorHandler from './middlewares/errorHandler'
+import ProductImporter from './config/productImporter'
 
 dataSource
   .initialize()
-  .then(() => {
+  .then(async () => {
     console.log('Data Source has been initialized!')
+    await ProductImporter.loadAllProducts()
   })
   .catch((err) => {
     console.error('Error during Data Source initialization:', err)
