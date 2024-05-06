@@ -46,4 +46,12 @@ export default class Kosarica extends BaseEntity {
     (proizvodKupac: ProizvodKupac) => proizvodKupac.kosarica,
   )
   proizvodKupacs!: Relation<ProizvodKupac[]>
+
+  public get products() {
+    return this.proizvodKupacs.map((pk) => {
+      const product = pk.proizvod
+      product.updateQuantityAndPrice(pk.kolicina, pk.cijena)
+      return product
+    })
+  }
 }

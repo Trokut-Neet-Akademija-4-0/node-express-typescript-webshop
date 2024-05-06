@@ -8,12 +8,15 @@ import {
   deleteProductById,
   getProductPictures,
   updatePictures,
+  deletePictureById,
 } from '../controllers/productController'
 
 const router = express.Router()
 
 // dohvacanje svih produkta kao liste
 router.get('/', getAllProducts)
+
+router.put('/pictures', updatePictures)
 // dohvacanje jednog produkta kao detalji produkta pomocu product id-a
 router.get('/:id', getProductById)
 
@@ -27,6 +30,6 @@ router.get('/:id/pictures', getProductPictures)
 
 router.post('/:id/pictures', addProductPictures)
 
-router.put('/pictures/:id', updatePictures)
+router.delete('/pictures/:id', deletePictureById)
 
 export default router

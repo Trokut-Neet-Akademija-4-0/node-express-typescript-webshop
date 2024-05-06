@@ -53,6 +53,12 @@ const updatePictures = async (req: Request, res: Response) => {
   )
 }
 
+const deletePictureById = async (req: Request, res: Response) => {
+  res.send(
+    await productService.deletePictureById(Number.parseInt(req.params.id, 10)),
+  )
+}
+
 export {
   getAllProducts,
   getProductById,
@@ -62,4 +68,5 @@ export {
   deleteProductById,
   getProductPictures,
   updatePictures,
+  deletePictureById,
 }
