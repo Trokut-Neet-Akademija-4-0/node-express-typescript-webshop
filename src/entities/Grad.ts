@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import Adresa from './Adresa'
+import AddressInformation from '../models/addressInformation'
 
 @Index('Grad_pkey', ['gradId'], { unique: true })
 @Entity('Grad', { schema: 'public' })
@@ -30,4 +31,24 @@ export default class Grad extends BaseEntity {
 
   @OneToMany(() => Adresa, (adresa: Adresa) => adresa.grad)
   adresas!: Adresa[]
+
+  public static async GetExistingGradFromAddressInformation(
+    address: AddressInformation,
+  ): Promise<Grad | null> {
+    return Grad.findOne({
+      where: {
+        drzava: address.drzava,
+        grad: address.grad,
+        postanskiBroj: address.postanskiBroj,
+      },
+    })
+  }
+
+  public static GradFromAddressInformation(address: AddressInformation): Grad {
+    const grad = new Grad()
+    grad.drzava = address.drzava
+    grad.grad = address.grad
+    grad.postanskiBroj = address.postanskiBroj
+    return grad
+  }
 }

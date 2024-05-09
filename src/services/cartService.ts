@@ -1,10 +1,14 @@
 /* eslint-disable class-methods-use-this */
+import { randomUUID } from 'crypto'
 import productService from './productService'
 import HttpError from '../utils/HttpError'
 import Kosarica from '../entities/Kosarica'
 import ProizvodKupac from '../entities/ProizvodKupac'
 import Proizvod from '../entities/Proizvod'
 import CartProductAddRequest from '../models/request/cartProductAddRequest'
+import CartBuyerInformationRequest from '../models/request/cartBuyerInformationRequest'
+import Kupac from '../entities/Kupac'
+import Racun from '../entities/Racun'
 
 // Cart servis gdje nam se nalazi cila nasa poslovna logika vezana za kosaricu
 class CartService {
@@ -25,7 +29,17 @@ class CartService {
 
   async getCartById(cartId: number): Promise<Kosarica> {
     const foundCart = await Kosarica.findOne({
-      relations: ['kupac', 'proizvodKupacs', 'proizvodKupacs.proizvod'],
+      relations: [
+        'kupac',
+        'kupac.adresa',
+        'kupac.adresa.grad',
+        'kupac.kupacDostava',
+        'kupac.kupacDostava.adresa',
+        'kupac.kupacDostava.adresa.grad',
+        'proizvodKupacs',
+        'proizvodKupacs.proizvod',
+        'racun',
+      ],
       where: {
         kosaricaId: cartId,
       },
@@ -41,7 +55,7 @@ class CartService {
     productId: number,
     cartProductAddRequest: CartProductAddRequest,
   ): Promise<Kosarica> {
-    const cart = await this.getCartById(cartId)
+    let cart = await this.getCartById(cartId)
     const product = await productService.getProductById(productId)
 
     this.checkIsQuantityValid(product, cartProductAddRequest.quantity)
@@ -62,7 +76,9 @@ class CartService {
       await cartProduct.save()
     }
 
-    return this.getCartById(cartId)
+    cart = await this.getCartById(cartId)
+    await cart.UpdateTotal()
+    return cart
   }
 
   async updateProductQuantity(
@@ -83,6 +99,7 @@ class CartService {
       existingProductInCart.kolicina = cartProductAddRequest.quantity
       await existingProductInCart.save()
     }
+    await cart.UpdateTotal()
     return cart
   }
 
@@ -90,7 +107,7 @@ class CartService {
     cartId: number,
     productId: number,
   ): Promise<Kosarica> {
-    const cart = await this.getCartById(cartId)
+    let cart = await this.getCartById(cartId)
 
     const existingProductInCart = cart.proizvodKupacs.find(
       (pk) => pk.proizvod.proizvodId === productId,
@@ -99,6 +116,52 @@ class CartService {
     if (existingProductInCart) {
       await existingProductInCart.remove()
     }
+    cart = await this.getCartById(cartId)
+    await cart.UpdateTotal()
+    return cart
+  }
+
+  async clearCart(cartId: number): Promise<Kosarica> {
+    let cart = await this.getCartById(cartId)
+    await ProizvodKupac.remove(cart.proizvodKupacs)
+    cart = await this.getCartById(cartId)
+    await cart.UpdateTotal()
+    return cart
+  }
+
+  async purchaseCartById(
+    cartId: number,
+    buyerInformation: CartBuyerInformationRequest,
+  ): Promise<Kosarica> {
+    const cart = await this.getCartById(cartId)
+    if (cart.isProcessed) {
+      throw new HttpError(500, `Cart with id ${cartId} already processed`)
+    }
+    let dostava: Kupac | null = null
+    if (buyerInformation.dostava) {
+      dostava = await Kupac.CreateKupacFromBuyerInformation(
+        buyerInformation.dostava,
+      )
+    }
+    const kupac = await Kupac.CreateKupacFromBuyerInformation(
+      buyerInformation.kupac,
+    )
+    if (dostava) {
+      kupac.kupacDostava = dostava
+      await kupac.save()
+    }
+    cart.kupac = kupac
+    cart.isProcessed = true
+    if (!cart.racun) {
+      const racun = new Racun()
+      racun.idUplate = randomUUID()
+      racun.jir = randomUUID()
+      racun.nacinPlacanja = 'CASH'
+      racun.total = cart.total
+      await racun.save()
+      cart.racun = racun
+    }
+    await cart.save()
     return this.getCartById(cartId)
   }
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import cartService from '../services/cartService'
 import CartProductAddRequest from '../models/request/cartProductAddRequest'
+import CartBuyerInformationRequest from '../models/request/cartBuyerInformationRequest'
 
 const getCart = async (req: Request, res: Response) => {
   res.send(await cartService.getCart())
@@ -8,6 +9,16 @@ const getCart = async (req: Request, res: Response) => {
 
 const getCartById = async (req: Request, res: Response) => {
   res.send(await cartService.getCartById(Number.parseInt(req.params.id, 10)))
+}
+
+const purchaseCartById = async (req: Request, res: Response) => {
+  const buyerInformation = req.body as CartBuyerInformationRequest
+  res.send(
+    await cartService.purchaseCartById(
+      Number.parseInt(req.params.id, 10),
+      buyerInformation,
+    ),
+  )
 }
 
 const addProductToCart = async (req: Request, res: Response) => {
@@ -38,8 +49,8 @@ const removeProductFromCart = async (req: Request, res: Response) => {
   res.send(await cartService.removeProductFromCart(cartId, productId))
 }
 
-const clearCart = (req: Request, res: Response) => {
-  res.send(cartService.clearCart())
+const clearCart = async (req: Request, res: Response) => {
+  res.send(await cartService.clearCart(Number.parseInt(req.params.cartId, 10)))
 }
 
 export {
@@ -49,4 +60,5 @@ export {
   updateProductQuantity,
   removeProductFromCart,
   clearCart,
+  purchaseCartById,
 }

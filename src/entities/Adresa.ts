@@ -11,6 +11,7 @@ import {
 } from 'typeorm'
 import Grad from './Grad'
 import Kupac from './Kupac'
+import AddressInformation from '../models/addressInformation'
 
 @Index('Adresa_pkey', ['adresaId'], { unique: true })
 @Entity('Adresa', { schema: 'public' })
@@ -37,4 +38,35 @@ export default class Adresa extends BaseEntity {
 
   @OneToMany(() => Kupac, (kupac: Kupac) => kupac.adresa)
   kupacs!: Kupac[]
+
+  public static async GetExistingAddressFromAddressInformation(
+    address: AddressInformation,
+  ): Promise<Adresa | null> {
+    const grad = await Grad.GetExistingGradFromAddressInformation(address)
+    if (!grad) return null
+    return Adresa.findOne({
+      where: {
+        broj: address.broj,
+        napomenaDostavljacu: address.napomenaDostavljacu,
+        ulica: address.ulica,
+        grad,
+      },
+    })
+  }
+
+  public static async CreateAdresaFromAddressInformation(
+    address: AddressInformation,
+  ): Promise<Adresa> {
+    let grad = await Grad.GetExistingGradFromAddressInformation(address)
+    if (!grad) {
+      grad = Grad.GradFromAddressInformation(address)
+      await grad.save()
+    }
+    const adresa = new Adresa()
+    adresa.broj = address.broj
+    adresa.napomenaDostavljacu = address.napomenaDostavljacu
+    adresa.ulica = address.ulica
+    adresa.grad = grad
+    return adresa.save()
+  }
 }

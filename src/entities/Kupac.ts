@@ -12,6 +12,7 @@ import {
 import Kosarica from './Kosarica'
 import Adresa from './Adresa'
 import ProizvodKupac from './ProizvodKupac'
+import BuyerInformation from '../models/buyerInformation'
 
 @Index('Kupac_pkey', ['kupacId'], { unique: true })
 @Entity('Kupac', { schema: 'public' })
@@ -54,4 +55,40 @@ export default class Kupac extends BaseEntity {
     (proizvodKupac: ProizvodKupac) => proizvodKupac.kupac,
   )
   proizvodKupacs!: ProizvodKupac[]
+
+  public static async GetExistingKupacFromBuyerInformation(
+    buyer: BuyerInformation,
+  ): Promise<Kupac | null> {
+    return Kupac.findOne({
+      where: {
+        email: buyer.email,
+        ime: buyer.ime,
+        prezime: buyer.prezime,
+        brojTelefona: buyer.brojTelefona,
+      },
+    })
+  }
+
+  public static async CreateKupacFromBuyerInformation(
+    buyer: BuyerInformation,
+  ): Promise<Kupac> {
+    let adresa = await Adresa.GetExistingAddressFromAddressInformation(
+      buyer.adresa,
+    )
+    if (!adresa) {
+      adresa = await Adresa.CreateAdresaFromAddressInformation(buyer.adresa)
+      await adresa.save()
+    }
+    let kupac = await Kupac.GetExistingKupacFromBuyerInformation(buyer)
+    if (!kupac) {
+      kupac = new Kupac()
+      kupac.email = buyer.email
+      kupac.ime = buyer.ime
+      kupac.prezime = buyer.prezime
+      kupac.brojTelefona = buyer.brojTelefona
+      kupac.adresa = adresa
+      await kupac.save()
+    }
+    return kupac
+  }
 }

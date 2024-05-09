@@ -16,7 +16,7 @@ export default class Racun extends BaseEntity {
   racunId!: number
 
   @Column('numeric', { name: 'total', nullable: true, precision: 10, scale: 2 })
-  total!: string | null
+  total!: number | null
 
   @Column('character varying', {
     name: 'nacin_placanja',

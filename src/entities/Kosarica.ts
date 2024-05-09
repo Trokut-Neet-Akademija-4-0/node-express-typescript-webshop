@@ -31,7 +31,7 @@ export default class Kosarica extends BaseEntity {
   status!: string | null
 
   @Column('numeric', { name: 'total', nullable: true, precision: 10, scale: 2 })
-  total!: string | null
+  total!: number | null
 
   @ManyToOne(() => Kupac, (kupac: Kupac) => kupac.kosaricas)
   @JoinColumn([{ name: 'kupac_id', referencedColumnName: 'kupacId' }])
@@ -53,5 +53,14 @@ export default class Kosarica extends BaseEntity {
       product.updateQuantityAndPrice(pk.kolicina, pk.cijena)
       return product
     })
+  }
+
+  public async UpdateTotal(): Promise<void> {
+    this.total = 0
+    this.proizvodKupacs.forEach((pk) => {
+      if (this.total != null) this.total += pk.cijena * pk.kolicina
+      else this.total = pk.cijena * pk.kolicina
+    })
+    this.save()
   }
 }
