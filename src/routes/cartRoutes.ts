@@ -8,11 +8,12 @@ import {
   clearCart,
   purchaseCartById,
 } from '../controllers/cartController'
+import AuthMiddleware from '../middlewares/authHandler'
 
 const router = express.Router()
 
 // dohvat cije kosarice
-router.get('/', getCart)
+router.get('/', AuthMiddleware.authenticateJWT, getCart)
 router.get('/:id', getCartById)
 router.post('/:id/purchase', purchaseCartById)
 // dodavanje proizvoda na kosaricu pomocu product id-a
