@@ -1,6 +1,7 @@
 // src/index.js
 import express, { Express } from 'express'
 import 'reflect-metadata'
+import cors from 'cors'
 import dataSource from './app-data-source'
 import productRoutes from './routes/productRoutes'
 import cartRoutes from './routes/cartRoutes'
@@ -21,8 +22,10 @@ dataSource
 const app: Express = express()
 const port = process.env.PORT || 3000
 
+app.use(cors())
 app.use(errorHandler)
 app.use(express.json())
+app.use(express.static('public'))
 
 app.use('/products', productRoutes)
 app.use('/cart', cartRoutes)
