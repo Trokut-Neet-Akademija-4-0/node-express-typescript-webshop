@@ -26,6 +26,12 @@
       "rules": {
         // Add any TypeScript-specific rules here
       }
+    },
+    {
+      "files": ["tests/**/*"],
+      "env": {
+        "jest": true
+      }
     }
   ],
   "ignorePatterns": ["dist/"]

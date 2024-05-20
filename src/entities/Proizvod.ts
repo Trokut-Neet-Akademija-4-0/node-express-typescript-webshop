@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 import ProizvodKupac from './ProizvodKupac'
 import Slika from './Slika'
+import StringToFloatTransformer from '../utils/stringToFloatTransformer'
 
 @Index('Proizvod_pkey', ['proizvodId'], { unique: true })
 @Entity('Proizvod', { schema: 'public' })
@@ -33,7 +34,12 @@ export default class Proizvod extends BaseEntity {
   @Column('character varying', { name: 'opis', nullable: true, length: 2048 })
   opis!: string | null
 
-  @Column('numeric', { name: 'cijena', precision: 10, scale: 2 })
+  @Column('numeric', {
+    name: 'cijena',
+    precision: 10,
+    scale: 2,
+    transformer: new StringToFloatTransformer(),
+  })
   cijena!: number
 
   @Column('integer', { name: 'kolicina', nullable: true })
