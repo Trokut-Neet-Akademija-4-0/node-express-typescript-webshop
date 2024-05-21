@@ -6,19 +6,22 @@ import Slika from '../entities/Slika'
 import IProduct from '../models/interfaces/productInterface'
 import products from '../models/productsModel'
 import HttpError from '../utils/HttpError'
+import ProductResponse from '../models/response/ProductResponse'
 
 class ProductService {
   private products: IProduct[] = products
 
-  async getAllProducts(): Promise<Proizvod[]> {
-    return Proizvod.find({
-      relations: {
-        slikas: true,
-      },
-      where: {
-        deletedAt: IsNull(),
-      },
-    })
+  async getAllProducts(): Promise<ProductResponse[]> {
+    return (
+      await Proizvod.find({
+        relations: {
+          slikas: true,
+        },
+        where: {
+          deletedAt: IsNull(),
+        },
+      })
+    ).map((p) => p.toProductResponse())
   }
 
   async getProductById(id: number): Promise<Proizvod> {

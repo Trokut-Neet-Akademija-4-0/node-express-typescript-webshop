@@ -7,7 +7,6 @@ function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.log('ERRor')
   if (res.headersSent) {
     return next(err)
   }

@@ -13,6 +13,8 @@ import {
 import Kupac from './Kupac'
 import Racun from './Racun'
 import ProizvodKupac from './ProizvodKupac'
+import StringToFloatTransformer from '../utils/stringToFloatTransformer'
+import CartResponse from '../models/response/CartResponse'
 
 @Index('Kosarica_pkey', ['kosaricaId'], { unique: true })
 @Entity('Kosarica', { schema: 'public' })
@@ -30,7 +32,13 @@ export default class Kosarica extends BaseEntity {
   @Column('character varying', { name: 'status', nullable: true, length: 255 })
   status!: string | null
 
-  @Column('numeric', { name: 'total', nullable: true, precision: 10, scale: 2 })
+  @Column('numeric', {
+    name: 'total',
+    nullable: true,
+    precision: 10,
+    scale: 2,
+    transformer: new StringToFloatTransformer(),
+  })
   total!: number | null
 
   @ManyToOne(() => Kupac, (kupac: Kupac) => kupac.kosaricas)
@@ -62,5 +70,24 @@ export default class Kosarica extends BaseEntity {
       else this.total = pk.cijena * pk.kolicina
     })
     this.save()
+  }
+
+  toCartResponse(): CartResponse {
+    const cartResponse = new CartResponse()
+    cartResponse.cartId = this.kosaricaId
+    cartResponse.invoice = this.racun
+    cartResponse.total = this.total
+    cartResponse.isProcessed = this.isProcessed
+    cartResponse.status = this.status
+    cartResponse.cartProducts = this.proizvodKupacs.map((pk) =>
+      pk.toCartProductsResponse(),
+    )
+
+    cartResponse.buyerInformation = this.kupac?.toUserResponse()
+    cartResponse.deliveryInformation = (
+      this.kupac.kupacDostava ? this.kupac.kupacDostava : this.kupac
+    ).toUserResponse()
+
+    return cartResponse
   }
 }

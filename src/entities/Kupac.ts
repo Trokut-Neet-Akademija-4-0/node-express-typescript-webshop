@@ -13,10 +13,13 @@ import Kosarica from './Kosarica'
 import Adresa from './Adresa'
 import ProizvodKupac from './ProizvodKupac'
 import BuyerInformation from '../models/buyerInformation'
+import UserResponse from '../models/response/UserResponse'
+import IntegerToRoleTransformer from '../utils/integerToRoleTransformer'
+import Role from '../models/enums/Role'
 
 @Index('Kupac_pkey', ['kupacId'], { unique: true })
 @Entity('Kupac', { schema: 'public' })
-export default class Kupac extends BaseEntity {
+export default class Kupac extends BaseEntity implements Express.User {
   @PrimaryGeneratedColumn({ type: 'integer', name: 'kupac_id' })
   kupacId!: number
 
@@ -35,6 +38,13 @@ export default class Kupac extends BaseEntity {
     length: 32,
   })
   brojTelefona!: string | null
+
+  @Column('integer', {
+    name: 'role',
+    nullable: true,
+    transformer: new IntegerToRoleTransformer(),
+  })
+  role!: Role
 
   @OneToMany(() => Kosarica, (kosarica: Kosarica) => kosarica.kupac)
   kosaricas!: Kosarica[]
@@ -90,5 +100,26 @@ export default class Kupac extends BaseEntity {
       await kupac.save()
     }
     return kupac
+  }
+
+  toUserResponse() {
+    const userResponse = new UserResponse()
+    userResponse.userId = this.kupacId
+    userResponse.firstName = this.ime
+    userResponse.lastName = this.prezime
+    userResponse.phoneNumber = this.brojTelefona
+    userResponse.email = this.email
+    if (this.adresa) {
+      userResponse.deliveryNotice = this.adresa.napomenaDostavljacu
+      userResponse.street = this.adresa.ulica
+      userResponse.streetNumber = this.adresa.broj
+      if (this.adresa.grad) {
+        userResponse.city = this.adresa.grad.grad
+        userResponse.postalNumber = this.adresa.grad.postanskiBroj
+        userResponse.country = this.adresa.grad.drzava
+      }
+    }
+
+    return userResponse
   }
 }

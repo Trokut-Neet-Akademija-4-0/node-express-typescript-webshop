@@ -9,6 +9,7 @@ import CartProductAddRequest from '../models/request/cartProductAddRequest'
 import CartBuyerInformationRequest from '../models/request/cartBuyerInformationRequest'
 import Kupac from '../entities/Kupac'
 import Racun from '../entities/Racun'
+import CartResponse from '../models/response/CartResponse'
 
 // Cart servis gdje nam se nalazi cila nasa poslovna logika vezana za kosaricu
 class CartService {
@@ -25,6 +26,10 @@ class CartService {
       nonProcessedCart = await nonProcessedCart.save()
     }
     return nonProcessedCart
+  }
+
+  async getCartResponseById(cartId: number): Promise<CartResponse> {
+    return (await this.getCartById(cartId)).toCartResponse()
   }
 
   async getCartById(cartId: number): Promise<Kosarica> {

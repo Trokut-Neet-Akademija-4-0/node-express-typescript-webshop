@@ -2,6 +2,7 @@
 import express, { Express } from 'express'
 import 'reflect-metadata'
 import cors from 'cors'
+import compression from 'compression'
 import dataSource from './app-data-source'
 import productRoutes from './routes/productRoutes'
 import cartRoutes from './routes/cartRoutes'
@@ -23,6 +24,7 @@ const app: Express = express()
 const port = process.env.PORT || 3000
 
 app.use(cors())
+app.use(compression())
 app.use(errorHandler)
 app.use(express.json())
 app.use(express.static('public'))

@@ -4,11 +4,14 @@ import CartProductAddRequest from '../models/request/cartProductAddRequest'
 import CartBuyerInformationRequest from '../models/request/cartBuyerInformationRequest'
 
 const getCart = async (req: Request, res: Response) => {
+  console.log(req.user)
   res.send(await cartService.getCart())
 }
 
 const getCartById = async (req: Request, res: Response) => {
-  res.send(await cartService.getCartById(Number.parseInt(req.params.id, 10)))
+  res.send(
+    await cartService.getCartResponseById(Number.parseInt(req.params.id, 10)),
+  )
 }
 
 const purchaseCartById = async (req: Request, res: Response) => {
